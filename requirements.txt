@@ -1,0 +1,3 @@
+irc
+APScheduler
+python-dotenv
