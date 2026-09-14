@@ -1,5 +1,6 @@
 import os
 from dotenv import load_dotenv
+from zoneinfo import ZoneInfo
 
 load_dotenv()
 
@@ -12,3 +13,6 @@ DATABASE_PATH = os.getenv("DATABASE_PATH", "data/kage.db")
 
 # Minutos antes da tarefa para enviar o aviso
 REMINDER_MINUTES = int(os.getenv("REMINDER_MINUTES","15"))
+
+# Pega o timezone do .env com ZoneInfo
+TIMEZONE = ZoneInfo(os.getenv("TIMEZONE", "UTC"))

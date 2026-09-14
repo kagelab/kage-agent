@@ -4,6 +4,7 @@ from app.database.models import (
     get_pending_reminders,
     mark_reminder_sent
 )
+from app.config import TIMEZONE
 
 class TaskScheduler:
     def __init__(self, send_message):
@@ -24,7 +25,7 @@ class TaskScheduler:
         self.scheduler.shutdown()
 
     def check_tasks(self):
-        now = datetime.now()
+        now = datetime.now(TIMEZONE).replace(tzinfo=None)
         # Busca os avisos pendentes
         reminders = get_pending_reminders()
         for reminder in reminders:
