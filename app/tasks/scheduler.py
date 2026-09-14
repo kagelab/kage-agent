@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from apscheduler.schedulers.background import BackgroundScheduler
 from app.database.models import (
     get_pending_reminders,
@@ -32,8 +32,11 @@ class TaskScheduler:
                 reminder["remind_at"],
                 "%d-%m-%Y %H:%M"
             )
+            delay = now - remind_at
+            if delay > timedelta(minutes=2):
+                mark_reminder_sent(reminder["id"])
 
-            if remind_at <= now:
+            elif remind_at <= now:
                 if reminder["reminder_type"] == "before":
                     message = (
                         f"[TODO](Em Breve): {reminder['title']} "

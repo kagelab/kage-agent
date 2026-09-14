@@ -160,6 +160,51 @@ def edit_task(
     new_date = task_date or task["task_date"]
     new_time = task_time or task["task_time"]
 
+    # Verifica se a nova data e horário é diferente da antiga
+    schedule_changed = (
+        new_date != task["task_date"]
+        or new_time != task["task_time"]
+    )
+
+    if schedule_changed:
+        connection.execute(
+            """
+            DELETE from reminders
+            WHERE task_id = ?
+            """,
+            (task_id,)
+        )
+
+        task_datetime = datetime.strptime(
+            f"{new_date} {new_time}",
+            "%d-%m-%Y %H:%M"
+        )
+
+        # Horário do aviso antes da tarefa
+        reminder_time = (
+            task_datetime - timedelta(minutes=REMINDER_MINUTES)
+        )
+
+        # transforma a data e hora da tarefa e aviso em string
+        task_datetime_str = task_datetime.strftime("%d-%m-%Y %H:%M")
+        reminder_time_str = reminder_time.strftime(
+            "%d-%m-%Y %H:%M"
+        )
+
+        create_reminder(
+            connection,
+            task_id,
+            reminder_time_str,
+            "before"
+        )
+
+        create_reminder(
+            connection,
+            task_id,
+            task_datetime_str,
+            "at_time"
+        )
+
     connection.execute(
         """
         UPDATE tasks
