@@ -288,3 +288,145 @@ def mark_reminder_sent(reminder_id):
     # Salva a alteração no banco
     connection.commit()
     connection.close()
+
+
+# v2
+def create_routine(title, description=None):
+    connection = get_connection()
+
+    cursor = connection.execute(
+        """
+        INSERT INTO routines (
+            title,
+            description,
+            status
+        )
+        VALUES (?, ?, 'active')
+        """,
+        (
+            title,
+            description
+        )
+    )
+
+    routine_id = cursor.lastrowid
+
+    connection.commit()
+    connection.close()
+
+    return routine_id
+
+
+def add_routine_schedule(
+        routine_id,
+        day,
+        start_time = None,
+        end_time = None
+):
+    connection = get_connection()
+
+    cursor = connection.execute(
+        """
+        INSERT INTO routine_schedule (
+            routine_id,
+            day,
+            start_time,
+            end_time
+        )
+        VALUES (?, ?, ?, ?)
+        """,
+        (
+            routine_id,
+            day,
+            start_time,
+            end_time
+        )
+    )
+
+    schedule_id = cursor.lastrowid
+
+    connection.commit()
+    connection.close()
+
+    return schedule_id
+
+
+def get_routine_schedule(routine_id):
+    connection = get_connection()
+
+    schedules = connection.execute(
+        """
+        SELECT *
+        FROM routine_schedule
+        WHERE routine_id = ?
+        ORDER BY id
+        """,
+        (routine_id,)
+    ).fetchall()
+
+    connection.close()
+
+    return schedules
+
+
+def get_active_routines():
+    connection = get_connection()
+
+    routines = connection.execute(
+        """
+        SELECT *
+        FROM routines
+        WHERE status = 'active'
+        ORDER BY id
+        """
+    ).fetchall()
+
+    connection.close()
+
+    return routines
+
+
+def edit_routine_schedule(
+        schedule_id,
+        day=None,
+        start_time=None,
+        end_time=None
+):
+    connection = get_connection()
+    schedule = connection.execute(
+        """
+        SELECT *
+        FROM routine_schedule
+        WHERE id = ?
+        """,
+        (schedule_id,)
+    ).fetchone()
+
+    if not schedule:
+        connection.close()
+        return False
+
+    new_day = day or schedule["day"]
+    new_start_time = start_time or schedule["start_time"]
+    new_end_time = end_time or schedule["end_time"]
+
+    connection.execute(
+        """
+        UPDATE routine_schedule
+        SET day = ?,
+            start_time = ?,
+            end_time = ?
+        WHERE id = ?
+        """,
+        (
+            new_day,
+            new_start_time,
+            new_end_time,
+            schedule_id
+        )
+    )
+
+    connection.commit()
+    connection.close()
+
+    return True

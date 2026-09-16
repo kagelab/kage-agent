@@ -66,6 +66,51 @@ def initialize_database():
             """
         )
 
+    connection.execute(
+        """
+        CREATE TABLE IF NOT EXISTS routines (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        title TEXT NOT NULL,
+        description TEXT,
+        status TEXT NOT NULL DEFAULT 'active'
+        )
+        """
+    )
+
+    query = """
+        SELECT COUNT(*)
+        FROM pragma_table_info(?)
+        WHERE name = ?
+    """
+
+    result = connection.execute(
+        query,
+        ("routines","status")
+    ).fetchone()
+
+    if result[0] == 0:
+        connection.execute(
+            """
+            ALTER TABLE routines
+            ADD COLUMN status TEXT NOT NULL DEFAULT 'active'
+            """
+        )
+
+    # o routine_id guarda o id de uma rotina existente
+    connection.execute(
+        """
+        CREATE TABLE IF NOT EXISTS routine_schedule (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        routine_id INTEGER NOT NULL,
+        day TEXT NOT NULL,
+        start_time TEXT,
+        end_time TEXT,
+        FOREIGN KEY(routine_id)
+            REFERENCES routines(id)
+        )
+        """
+    )
+
     connection.commit()
     connection.close()
     
