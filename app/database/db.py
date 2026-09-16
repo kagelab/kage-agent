@@ -77,25 +77,6 @@ def initialize_database():
         """
     )
 
-    query = """
-        SELECT COUNT(*)
-        FROM pragma_table_info(?)
-        WHERE name = ?
-    """
-
-    result = connection.execute(
-        query,
-        ("routines","status")
-    ).fetchone()
-
-    if result[0] == 0:
-        connection.execute(
-            """
-            ALTER TABLE routines
-            ADD COLUMN status TEXT NOT NULL DEFAULT 'active'
-            """
-        )
-
     # o routine_id guarda o id de uma rotina existente
     connection.execute(
         """
