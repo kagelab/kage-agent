@@ -16,3 +16,6 @@ REMINDER_MINUTES = int(os.getenv("REMINDER_MINUTES","15"))
 
 # Pega o timezone do .env com ZoneInfo
 TIMEZONE = ZoneInfo(os.getenv("TIMEZONE", "UTC"))
+
+# Idioma dos dias das semanas
+SCHEDULE_LANG = os.getenv("SCHEDULE_LANG", "pt-BR")

@@ -1,5 +1,15 @@
 from app.database.db import get_connection
 
+DAY_ORDER = {
+    "MON": 0,
+    "TUE": 1,
+    "WED": 2,
+    "THU": 3,
+    "FRI": 4,
+    "SAT": 5,
+    "SUN": 6,
+}
+
 def create_routine(title, description=None):
     connection = get_connection()
 
@@ -84,10 +94,18 @@ def get_routine_schedules(routine_id):
         SELECT *
         FROM routine_schedule
         WHERE routine_id = ?
-        ORDER BY day, start_time
         """,
         (routine_id,)
     ).fetchall()
+
+    # ordena os dias pelo DAY_ORDER e horários
+    schedules = sorted(
+        schedules,
+        key=lambda schedule: (
+            DAY_ORDER[schedule["day"]],
+            schedule["start_time"]
+        )
+    )
 
     connection.close()
     return schedules
