@@ -136,3 +136,50 @@ def delete_routine(routine_id):
     connection.close()
 
     return changed
+
+
+def edit_routine_schedule(
+    schedule_id,
+    day=None,
+    start_time=None,
+    end_time=None,
+):
+    connection = get_connection()
+
+    schedule = connection.execute(
+        """
+        SELECT *
+        FROM routine_schedule
+        WHERE id = ?
+        """,
+        (schedule_id,),
+    ).fetchone()
+
+    if not schedule:
+        connection.close()
+        return False
+
+    new_day = day or schedule["day"]
+    new_start_time = start_time or schedule["start_time"]
+    new_end_time = end_time or schedule["end_time"]
+
+    connection.execute(
+        """
+        UPDATE routine_schedule
+        SET day = ?,
+            start_time = ?,
+            end_time = ?
+        WHERE id = ?
+        """,
+        (
+            new_day,
+            new_start_time,
+            new_end_time,
+            schedule_id
+        )
+    )
+
+    connection.commit()
+    connection.close()
+
+    return True
