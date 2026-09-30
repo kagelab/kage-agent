@@ -159,9 +159,17 @@ def edit_routine_schedule(
         connection.close()
         return False
 
-    new_day = day or schedule["day"]
-    new_start_time = start_time or schedule["start_time"]
-    new_end_time = end_time or schedule["end_time"]
+    new_day = schedule["day"] if day is None else day
+    new_start_time = (
+        schedule["start_time"]
+        if start_time is None
+        else start_time
+    )
+    new_end_time = (
+        schedule["end_time"]
+        if end_time is None
+        else end_time
+    )
 
     connection.execute(
         """
