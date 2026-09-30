@@ -39,7 +39,7 @@ def create_routine(title, description=None):
 def add_routine_schedule(
     routine_id,
     day,
-    start_time=None, # rotina com horários flexíveis
+    start_time=None,
     end_time=None
 ):
     connection = get_connection()
