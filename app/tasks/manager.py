@@ -1,5 +1,4 @@
 from datetime import datetime
-
 from app.database.models import (
     create_task,
     get_task,
@@ -8,6 +7,7 @@ from app.database.models import (
     delete_task,
     edit_task
 )
+from app.tasks.routines import edit_routine_schedule
 
 # Formato da data e hora usado pelo bot
 DATE_FORMAT = "%d-%m-%Y"
@@ -189,6 +189,54 @@ def process_command(command, args):
             "!edit ID HORA TAREFA *** "
             "!delete ID"
         )
+    if command == "!agenda-edit":
+        return agenda_edit_command(args)
+
+
 
     return None
+    
+
+def agenda_edit_command(args):
+    parts = args.split()
+
+    if len(parts) != 4:
+        return (
+            "[Uso] = !agenda-edit ID DIA INÍCIO FIM | "
+            "ex: !agenda-edit 3 WED 18:00 19:00"
+        )
+    try:
+        schedule_id = int(parts[0])
+    except ValueError:
+        return "[!] ID inválido."
+
+    day = parts[1].upper()
+    start_time = parts[2]
+    end_time = parts[3]
+
+    if day not in (
+        "MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"
+    ):
+        return "[!] Dia inválido. Use MON TUE WED THU FRI SAT ou SUN" 
+
+    try:
+        datetime.strptime(start_time, TIME_FORMAT)
+        datetime.strptime(end_time,TIME_FORMAT)
+    except ValueError:
+        return "[!] Hora inválida. Use HH:MM."
+
+    changed = edit_routine_schedule(
+        schedule_id,
+        day=day,
+        start_time=start_time,
+        end_time=end_time,
+    )
+
+    if not changed:
+        return f"[!] Agenda #{schedule_id} não encontrada."
+
+    return (
+        f"[OK] Agenda #{schedule_id} alterada: "
+        f"{day} {start_time}-{end_time}"
+    )
     
