@@ -216,8 +216,8 @@ def process_command(command, args):
             "!edit ID HORA TAREFA, "
             "!agenda-edit ID DIA INÍCIO FIM, "
             "!delete ID"
-
         )
+    
     if command == "!agenda-edit":
         return agenda_edit_command(args)
 
