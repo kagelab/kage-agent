@@ -7,7 +7,10 @@ from app.database.models import (
     delete_task,
     edit_task
 )
-from app.tasks.routines import edit_routine_schedule
+from app.tasks.routines import (
+    edit_routine_schedule,
+    get_week_schedule
+)
 
 # Formato da data e hora usado pelo bot
 DATE_FORMAT = "%d-%m-%Y"
@@ -162,6 +165,26 @@ def edit_command(args):
         f"[OK] Tarefa #{task_id} alterada: "
         f"{task_time} - {title}"
     )
+
+
+def week_command():
+    schedules = get_week_schedule()
+
+    if not schedules:
+        return "[FREE] Nenhuma rotina agendada."
+    result =  [
+        "[WEEK] Semana:"
+    ]
+
+    for schedule in schedules:
+        result.append(
+            f'{schedule["day"]} '
+            f'{schedule["start_time"]}--{schedule["end_time"]} '
+            f'{schedule["title"]}'
+        )
+
+    return result
+
     
 def process_command(command, args):
     command = command.lower()
@@ -172,6 +195,9 @@ def process_command(command, args):
     if command == "!agenda":
         return agenda_command()
 
+    if command == '!week':
+        return week_command()
+    
     if command == "!done":
         return done_command(args)
 
@@ -183,16 +209,17 @@ def process_command(command, args):
 
     if command == "!help":
         return (
-            "!add DATA HORA TAREFA *** "
-            "!agenda *** "
-            "!done ID *** "
-            "!edit ID HORA TAREFA *** "
+            "!add DATA HORA TAREFA, "
+            "!agenda, "
+            "!week, "
+            "!done ID, "
+            "!edit ID HORA TAREFA, "
+            "!agenda-edit ID DIA INÍCIO FIM, "
             "!delete ID"
+
         )
     if command == "!agenda-edit":
         return agenda_edit_command(args)
-
-
 
     return None
     

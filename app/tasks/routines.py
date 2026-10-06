@@ -191,3 +191,34 @@ def edit_routine_schedule(
     connection.close()
 
     return True
+
+
+def get_week_schedule():
+    connection = get_connection()
+
+    schedules = connection.execute(
+        """
+        SELECT
+            routine_schedule.day,
+            routine_schedule.start_time,
+            routine_schedule.end_time,
+            routines.title
+        FROM routine_schedule
+        JOIN routines
+            ON routines.id = routine_schedule.routine_id
+        WHERE routines.status = 'active'
+        """
+    ).fetchall()
+
+    schedules = sorted(
+        schedules,
+        key=lambda schedule: (
+            DAY_ORDER[schedule["day"]],
+            schedule["start_time"] or ""
+        )
+    )
+
+    connection.close()
+
+    return schedules
+
